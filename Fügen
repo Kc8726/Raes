@@ -1,0 +1,53 @@
+// Installieren Sie die Firebase SDKs mit npm:
+// npm install firebase
+
+// Initialisieren Sie Firebase mit Ihren Konfigurationsdaten
+const firebaseConfig = {
+  apiKey: "Ihr_API-Schlüssel",
+  authDomain: "Ihre_Auth-Domäne",
+  projectId: "Ihre_Projekt-ID",
+  storageBucket: "Ihr_Storage-Bucket",
+  messagingSenderId: "Ihre_Messaging-Sender-ID",
+  appId: "Ihre_App-ID"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+// Verweisen Sie auf die Firebase-Datenbank
+const database = firebase.database();
+
+// Referenz für die Nachrichten in der Datenbank
+const nachrichtenRef = database.ref('nachrichten');
+
+// Funktion zum Senden einer Nachricht an die Datenbank
+function nachrichtSenden(sender, text) {
+  // Erstellen Sie ein neues Datenbankobjekt für die Nachricht
+  const neueNachricht = {
+    sender: sender,
+    text: text,
+    timestamp: firebase.database.ServerValue.TIMESTAMP
+  };
+
+  // Fügen Sie die Nachricht der Datenbank hinzu
+  nachrichtenRef.push(neueNachricht);
+}
+
+// Funktion zum Anzeigen von Nachrichten aus der Datenbank
+function nachrichtenAnzeigen() {
+  // Hören Sie auf Änderungen in der Nachrichten-Referenz
+  nachrichtenRef.on('value', function (snapshot) {
+    // Holen Sie sich alle Nachrichten aus dem Snapshot
+    const nachrichten = snapshot.val();
+
+    // Iterieren Sie durch die Nachrichten und zeigen Sie sie an
+    for (let key in nachrichten) {
+      const nachricht = nachrichten[key];
+      console.log(`${nachricht.sender}: ${nachricht.text}`);
+    }
+  });
+}
+
+// Beispielaufrufe der Funktionen
+nachrichtSenden('Benutzer1', 'Hallo, wie geht es Ihnen?');
+nachrichtSenden('Benutzer2', 'Mir geht es gut, danke!');
+nachrichtenAnzeigen();
